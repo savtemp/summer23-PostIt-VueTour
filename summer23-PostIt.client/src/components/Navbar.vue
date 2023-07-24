@@ -11,10 +11,22 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav me-auto">
-        <li>
+        <!-- <li>
           <router-link :to="{ name: 'About' }" class="btn text-success lighten-30 selectable text-uppercase">
             About
           </router-link>
+        </li> -->
+        <li>
+          <button v-if="account.id" class="btn btn-success" type="button" data-bs-toggle="modal"
+            data-bs-target="#exampleModal">
+            <i class="mdi mdi-plus-box"></i> new album
+          </button>
+        </li>
+        <li>
+          <button v-if="route.name == 'Album' && account.id && account.id == album?.creatorId" @click="archiveAlbum()"
+            class="btn btn-success ms-2" type="button">
+            <i class="mdi mdi-close-circle text-danger"></i> archive album
+          </button>
         </li>
       </ul>
       <!-- LOGIN COMPONENT HERE -->
@@ -24,10 +36,34 @@
 </template>
 
 <script>
+import { useRoute } from 'vue-router';
 import Login from './Login.vue';
+import Pop from '../utils/Pop.js';
+import { albumsService } from '../services/AlbumsService.js';
+import { computed } from 'vue';
+import { AppState } from '../AppState.js';
 export default {
   setup() {
-    return {}
+    const route = useRoute()
+    return {
+      route,
+      account: computed(() => AppState.account),
+      album: computed(() => AppState.activeAlbum),
+      async archiveAlbum() {
+        try {
+          const wantsToArchive = await Pop.confirm()
+
+          if (!wantsToArchive) {
+            return
+          }
+
+          const albumId = route.params.albumId
+          await albumsService.archiveAlbum(albumId)
+        } catch (error) {
+          Pop.error(error.message)
+        }
+      }
+    }
   },
   components: { Login }
 }
