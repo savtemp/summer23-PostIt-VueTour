@@ -13,6 +13,11 @@
               by: {{ album.creator.name }}
             </p>
           </div>
+          <div>
+            <!-- TODO disable or HIDE button if not album creator OR collaborator -->
+            <button :disabled="album.archived == true" data-bs-toggle="modal" data-bs-target="#createPictureModal"
+              class="btn btn-info rounded text-white"><i class="mdi mdi-plus-outline"></i> add picture</button>
+          </div>
         </div>
       </div>
       <!-- SECTION Album pictures -->

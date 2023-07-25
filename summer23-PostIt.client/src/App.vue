@@ -9,7 +9,7 @@
     Made with 💖 by CodeWorks
   </footer>
 
-  <ModalComponent>
+  <ModalComponent id="createAlbumModal">
 
     <template #header>
       Create Album
@@ -17,6 +17,18 @@
 
     <template #body>
       <AlbumForm />
+    </template>
+
+  </ModalComponent>
+
+  <ModalComponent id="createPictureModal">
+
+    <template #header>
+      Create Picture
+    </template>
+
+    <template #body>
+      <PictureForm />
     </template>
 
   </ModalComponent>

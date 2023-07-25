@@ -11,6 +11,13 @@ class PicturesService {
         AppState.pictures = res.data.map(d => new Picture(d))
     }
 
+    async createPicture(formData) {
+        const res = await api.post('api/pictures', formData)
+        logger.log('[CREATING PICTURE]', res.data)
+        const newPicture = new Picture(res.data)
+        AppState.pictures.unshift(newPicture)
+    }
+
 }
 
 export const picturesService = new PicturesService()
