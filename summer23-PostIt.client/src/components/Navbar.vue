@@ -18,7 +18,7 @@
         </li> -->
         <li>
           <button v-if="account.id" class="btn btn-success" type="button" data-bs-toggle="modal"
-            data-bs-target="#exampleModal">
+            data-bs-target="#createAlbumModal">
             <i class="mdi mdi-plus-box"></i> new album
           </button>
         </li>
