@@ -13,7 +13,7 @@ class AlbumsService {
   }
 
   async getAlbumById(albumId) {
-    const album = await dbContext.Albums.findById(albumId).populate('creator', 'name picture')
+    const album = await dbContext.Albums.findById(albumId).populate('creator', 'name picture').populate('memberCount')
     if (!album) {
       throw new BadRequest(`Album at albumId: ${albumId} does not exist.`)
     }

@@ -5,19 +5,36 @@
       <div v-if="album" class="col-md-3">
         <div class="d-flex justify-content-between align-items-start">
           <img :src="album.coverImg" :alt="album.title" class="cover-img rounded light-shadow">
-          <div class="rounded bg-warning p-1 light-shadow">
-            <p class="fs-4 fw-bold">
-              {{ album.title }}
-            </p>
-            <p class="fs-4">
-              by: {{ album.creator.name }}
-            </p>
-          </div>
           <div>
-            <!-- TODO disable or HIDE button if not album creator OR collaborator -->
-            <button :disabled="album.archived == true" data-bs-toggle="modal" data-bs-target="#createPictureModal"
-              class="btn btn-info rounded text-white"><i class="mdi mdi-plus-outline"></i> add picture</button>
+
+            <div class="rounded bg-warning p-1 light-shadow">
+              <p class="fs-4 fw-bold">
+                {{ album.title }}
+              </p>
+              <p class="fs-4">
+                by: {{ album.creator.name }}
+              </p>
+            </div>
+            <div class="pt-3 ">
+              <!-- TODO disable or HIDE button if not album creator OR collaborator -->
+              <button v-if="album.creatorId == account.id || isCollaborator" :disabled="album.archived == true"
+                data-bs-toggle="modal" data-bs-target="#createPictureModal" class="picture-btn fs-5"><i
+                  class="mdi mdi-plus-box"></i> add
+                Picture</button>
+            </div>
           </div>
+        </div>
+        <div class="d-flex pt-2">
+          <div class="rounded bg-info light-shadow p-2">
+            <h2>Collaborators: {{ album.memberCount }}</h2>
+          </div>
+          <button v-if="!isCollaborator" class="btn btn-secondary" @click="becomeCollaborator()">Collab <i
+              class="mdi mdi-heart"></i></button>
+          <button v-else class="btn btn-secondary" @click="removeCollaborator()">Uncollab <i
+              class="mdi mdi-heart-broken"></i></button>
+        </div>
+        <div class="d-flex pt-3">
+          <img class="collab-img mx-1" v-for="c in collaborators" :src="c.profile?.picture" alt="">
         </div>
       </div>
       <!-- SECTION Album pictures -->
@@ -41,7 +58,8 @@ import { computed, onMounted, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import Pop from '../utils/Pop.js';
 import { albumsService } from '../services/AlbumsService.js';
-import { picturesService } from '../services/PicturesService.js'
+import { picturesService } from '../services/PicturesService.js';
+import { collaboratorsService } from '../services/CollaboratorsService.js'
 import { AppState } from '../AppState.js';
 import { logger } from '../utils/Logger.js';
 
@@ -68,6 +86,16 @@ export default {
       }
     }
 
+    async function getCollaboratorsByAlbumId() {
+      try {
+        const albumId = route.params.albumId
+        await collaboratorsService.getCollaboratorsByAlbumId(albumId)
+      } catch (error) {
+        logger.error(error)
+        Pop.toast(error.message, 'error')
+      }
+    }
+
     // onMounted(() => {
     //   getAlbumById()
     // })
@@ -75,11 +103,47 @@ export default {
     watchEffect(() => {
       getAlbumById(route.params.albumId)
       getPicturesByAlbumId()
+      getCollaboratorsByAlbumId()
     })
 
     return {
       album: computed(() => AppState.activeAlbum),
-      pictures: computed(() => AppState.pictures)
+      pictures: computed(() => AppState.pictures),
+      collaborators: computed(() => AppState.albumCollabs),
+      account: computed(() => AppState.account),
+      isCollaborator: computed(() => {
+        return AppState.albumCollabs.find(c => c.accountId == AppState.account.id)
+      }),
+
+      async becomeCollaborator() {
+        try {
+          // logger.log('become collab')
+          const activeAlbumId = route.params.albumId
+          // const collabData = {}
+          // collabData.albumId = albumId
+          const collabData = { albumId: activeAlbumId }
+          await collaboratorsService.becomeCollaborator(collabData)
+          // NOTE: increase the memberCount to reflect the reactivity of becoming a new collaborator
+          AppState.activeAlbum.memberCount++
+        } catch (error) {
+          logger.error(error)
+          Pop.toast(error.message, 'error')
+        }
+      },
+
+      async removeCollaborator() {
+        try {
+          // logger.log('removing collab')
+          // debugger
+          const collaboratorToRemove = AppState.albumCollabs.find(c => c.accountId == AppState.account.id)
+          const collaboratorId = collaboratorToRemove.id
+          await collaboratorsService.removeCollaborator(collaboratorId)
+          AppState.activeAlbum.memberCount--
+        } catch (error) {
+          logger.error(error)
+          Pop.toast(error.message, 'error')
+        }
+      }
     }
   }
 }
@@ -99,5 +163,23 @@ export default {
   object-position: center;
   border-radius: 5px;
   box-shadow: 2px 2px white;
+}
+
+.collab-img {
+  height: 10vh;
+  width: 10vh;
+  border-radius: 5px;
+  box-shadow: 2px 2px white;
+
+}
+
+.picture-btn {
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  padding: .5em;
+  color: white;
+  background-color: #CA51A8;
+  font-weight: bold;
 }
 </style>

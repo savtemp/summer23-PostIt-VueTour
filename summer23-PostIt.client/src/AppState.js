@@ -13,5 +13,11 @@ export const AppState = reactive({
   activeAlbum: null,
 
   /** @type {import('./models/Picture.js').Picture[]} */
-  pictures: []
+  pictures: [],
+
+  /** @type {import('./models/Collaborator.js').Collaborator[]} */
+  albumCollabs: [],
+
+  /** @type {import('./models/Collaborator.js').Collaborator[]} */
+  myCollabs: []
 })

@@ -14,6 +14,7 @@ class CollaboratorsService {
     }
 
     const newCollab = await dbContext.Collaborators.create(collabData)
+    await newCollab.populate('profile', 'name picture')
     return newCollab
   }
 

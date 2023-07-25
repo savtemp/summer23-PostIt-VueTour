@@ -1,5 +1,5 @@
 export class Album {
-  constructor (data) {
+  constructor(data) {
     this.id = data.id
     this.title = data.title
     this.archived = data.archived
@@ -7,6 +7,7 @@ export class Album {
     this.category = data.category
     this.creatorId = data.creatorId
     this.creator = data.creator
+    this.memberCount = data.memberCount
   }
 }
 

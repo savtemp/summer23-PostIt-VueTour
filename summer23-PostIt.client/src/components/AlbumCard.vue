@@ -7,7 +7,7 @@
         <h2>{{ albumProp.title }}</h2>
         <h3>
           <i class="mdi mdi-heart"></i>
-          <span>0</span>
+          <span>{{ albumProp.memberCount }}</span>
         </h3>
       </div>
     </div>
@@ -22,7 +22,9 @@ export default {
   props: {
     // albumProp: { type: Object, required: true }
     // albumProp: { type: [Album, Object], required: true }
-    albumProp: { type: Album, required: true }
+    // albumProp: { type: Album, required: true }
+    albumProp: { type: Object, required: true } //NOTE: we changed this back to object for the many:many
+
   },
   setup() {
     function getRandomColor() {
