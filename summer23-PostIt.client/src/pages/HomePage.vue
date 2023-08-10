@@ -1,5 +1,6 @@
 <template>
   <!-- FIXME album collaborations go here-->
+  <!-- NOTE testing -->
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
