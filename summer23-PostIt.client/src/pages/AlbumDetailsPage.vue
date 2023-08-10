@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="row">
       <!-- SECTION Album details -->
-      <div v-if="album" class="col-md-3">
+      <div v-if="album" class="col-md-3" id="v-step-2">
         <div class="d-flex justify-content-between align-items-start">
           <img :src="album.coverImg" :alt="album.title" class="cover-img rounded light-shadow">
           <div>
@@ -50,6 +50,9 @@
       </div>
     </div>
   </div>
+
+  <Tour v-if="account.needsTour" :steps="steps" :callbacks="tourCallBacks" />
+
 </template>
 
 
@@ -62,6 +65,7 @@ import { picturesService } from '../services/PicturesService.js';
 import { collaboratorsService } from '../services/CollaboratorsService.js'
 import { AppState } from '../AppState.js';
 import { logger } from '../utils/Logger.js';
+import { accountService } from '../services/AccountService.js';
 
 export default {
   setup() {
@@ -143,7 +147,35 @@ export default {
           logger.error(error)
           Pop.toast(error.message, 'error')
         }
+      },
+
+      steps: [
+        {
+          target: '#v-step-2',
+          header: {
+            title: 'Album Details'
+          },
+          content: 'Look at these awesome details for this album'
+        },
+        {
+          target: '.picture-btn',
+          header: {
+            title: 'Create a picture'
+          },
+          content: 'Click add a picture to add a picture to the album',
+          params: {
+            placement: 'top-end'
+
+          }
+        }
+      ],
+        
+      tourCallBacks: {
+        onFinish: (() => accountService.editAccount({needsTour: false})),
+        onSkip: (() => accountService.editAccount({needsTour: false}))
       }
+
+    
     }
   }
 }
